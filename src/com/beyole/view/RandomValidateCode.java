@@ -15,6 +15,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 /**
  * 随机验证码view
@@ -26,15 +27,18 @@ import android.view.View;
 public class RandomValidateCode extends View {
 
 	// 文本
-	private String mTitleText;
+	private String mTitleText = "1234";
 	// 文本颜色
-	private int mTitleTextColor;
+	private int mTitleTextColor = Color.RED;
 	// 文本大小
-	private int mTitleTextSize;
+	private int mTitleTextSize = 16;
 	// 绘制时控制文本绘制范围
 	private Rect mBound;
 	// 画笔
 	private Paint mPaint;
+
+	// 点击事件监听器
+	private ValidateCodeOnClickListener mOnClickListener;
 
 	public RandomValidateCode(Context context) {
 		this(context, null);
@@ -78,15 +82,16 @@ public class RandomValidateCode extends View {
 		// 计算文字所在矩形，赋值到mBound中
 		mPaint.getTextBounds(mTitleText, 0, mTitleText.length(), mBound);
 		// 设置点击事件
-		this.setOnClickListener(new OnClickListener() {
+		
+			this.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				mTitleText = randomText();
-				// 在非主线程中重绘view
-				postInvalidate();
-			}
-		});
+				@Override
+				public void onClick(View v) {
+					if (mOnClickListener != null) {
+						mOnClickListener.onClick(v);
+					}
+				}
+			});
 	}
 
 	/**
@@ -145,22 +150,52 @@ public class RandomValidateCode extends View {
 	}
 
 	/**
-	 * 生成随机四位数
+	 * 获取当前验证码
 	 * 
 	 * @return
 	 */
-	private String randomText() {
-		Random random = new Random();
-		Set<Integer> set = new HashSet<Integer>();
-		while (set.size() < 4) {
-			int randomInt = random.nextInt(10);
-			set.add(randomInt);
-		}
-		StringBuilder builder = new StringBuilder();
-		for (Integer integer : set) {
-			builder.append("" + integer);
-		}
-		return builder.toString();
+	public String getCurrentValidateCode() {
+		return this.mTitleText;
+	}
+
+	public interface ValidateCodeOnClickListener {
+		public void onClick(View view);
+	}
+
+	/**
+	 * 设置单击事件监听器
+	 * 
+	 * @param listener
+	 */
+	public void setValidateCodeOnClickListener(ValidateCodeOnClickListener listener) {
+		this.mOnClickListener = listener;
+	}
+
+	/**
+	 * 设置验证码view内容
+	 * 
+	 * @param text
+	 */
+	public void setText(String text) {
+		this.mTitleText = text;
+	}
+
+	/**
+	 * 设置验证码文字颜色
+	 * 
+	 * @param color
+	 */
+	public void setTextColor(int color) {
+		this.mTitleTextColor = color;
+	}
+
+	/**
+	 * 设置验证码文字大小
+	 * 
+	 * @param textSize
+	 */
+	public void setTextSize(int textSize) {
+		this.mTitleTextSize = textSize;
 	}
 
 }
